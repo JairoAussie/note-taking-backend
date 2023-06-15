@@ -10,6 +10,9 @@ app.get("/", (request, response) => {
 	});
 });
 
+const notesRouter = require('./routes/notes_routes')
+app.use("/notes", notesRouter)
+
 module.exports = {
 	app
 }
