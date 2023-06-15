@@ -1,8 +1,10 @@
 const Note = require('../models/notes')
 
 const getNotes = (request, response) =>{
+
+    let notes = Note.find()
     response.json(
-        {"message": "The list of notes goes here"}
+        {"notes": notes}
     )
 }
 
