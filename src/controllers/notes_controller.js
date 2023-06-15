@@ -1,3 +1,4 @@
+const Note = require('../models/notes')
 
 const getNotes = (request, response) =>{
     response.json(
@@ -5,16 +6,17 @@ const getNotes = (request, response) =>{
     )
 }
 
-const createNote = (request, response) => {
+const createNote = async (request, response) => {
+    let newNote = new Note({
+        title: request.body.title,
+        description: request.body.description,
+        isCompleted: false,
+        dueDate: new Date().setDate(new Date().getDate() + 1),
+        createdAtDate: Date.now()
+    })
+    await newNote.save()
     response.json({
-        "note": {
-            "id": 1,
-            "title": request.body.title,
-            "description": request.body.description,
-            "isCompleted": false,
-            "dueDate": new Date().setDate(new Date().getDate() + 1),
-            "createdAtDate": Date.now()
-        }
+        note: newNote
     })
 }
 
