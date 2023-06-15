@@ -1,11 +1,9 @@
 const Note = require('../models/notes')
 
-const getNotes = (request, response) =>{
+const getNotes = async (request, response) =>{
 
-    let notes = Note.find()
-    response.json(
-        {"notes": notes}
-    )
+    let notes = await Note.find()
+    response.send(notes)
 }
 
 const createNote = async (request, response) => {
@@ -17,9 +15,15 @@ const createNote = async (request, response) => {
         createdAtDate: Date.now()
     })
     await newNote.save()
+    response.status(201)
+    response.json({note: newNote})
+}
+
+const deleteAllNotes = async (request, response) => {
+    await Note.deleteMany({})
     response.json({
-        note: newNote
+        "message": "All notes deleted"
     })
 }
 
-module.exports = {getNotes, createNote}
+module.exports = {getNotes, createNote, deleteAllNotes}
