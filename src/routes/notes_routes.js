@@ -1,23 +1,9 @@
 const express = require('express')
 const notesRouter = express.Router();
+const {getNotes, createNote} = require('../controllers/notes_controller')
 
-notesRouter.get("/", (request, response) =>{
-    response.json(
-        {"message": "The list of notes goes here"}
-    )
-})
+notesRouter.get("/", getNotes)
 
-notesRouter.post("/", (request, response) => {
-    response.json({
-        "note": {
-            "id": 1,
-            "title": "Welcome to the note taker",
-            "description": "Make your notes here",
-            "isCompleted": false,
-            "dueDate": new Date().setDate(new Date().getDate() + 1),
-            "createdAtDate": Date.now()
-        }
-    })
-})
+notesRouter.post("/", createNote)
 
 module.exports = notesRouter
