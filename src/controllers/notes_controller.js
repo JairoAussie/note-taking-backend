@@ -1,4 +1,5 @@
 const Note = require('../models/notes')
+const User = require('../models/user')
 
 const getNotes = async (request, response) =>{
     // request.query contains the string query url -> ?isComplete=true 
@@ -25,6 +26,12 @@ const getNotes = async (request, response) =>{
     
 }
 
+const getMyNotes = async (request, response) => {
+    //find user by username, once we have auth, this can be taken from the token
+    let user = await User.findOne({username: request.body.username}).populate('notes')
+    response.send(user.notes)
+}
+
 const getNote = async (request, response) => {
     let note = await Note.findById(request.params.id) //params contains the key and value of the route params :id 
                         .catch(error => {  // mongoose methos can handle errors with catch
@@ -40,6 +47,8 @@ const getNote = async (request, response) => {
 }
 
 const createNote = async (request, response) => {
+    let user = await User.findOne({username: request.body.username})
+
     let newNote = new Note({
         title: request.body.title,
         description: request.body.description,
@@ -48,8 +57,13 @@ const createNote = async (request, response) => {
         createdAtDate: Date.now()
     })
     await newNote.save()
+    user.notes.push(newNote._id)
+    await user.save() 
     response.status(201)
-    response.json({note: newNote})
+    response.json({
+        user: user,
+        note: newNote
+    })
 }
 
 const updateNote = async (request, response) => {
@@ -77,6 +91,7 @@ const deleteAllNotes = async (request, response) => {
 }
 
 const deleteNote = async (request, response) => {
+    let user = await User.findOne({username: request.body.username})
     // find the Note by id as in getNote, with request.params.id
     // delete the note
     note = await Note.findByIdAndDelete(request.params.id)
@@ -85,10 +100,12 @@ const deleteNote = async (request, response) => {
                 }) 
     // if we could find the note we will delete it
     if (note) {
+        //remove the note_id from the user's notes array
+        user.notes.shift(note._id);
         response.json({message: "note deleted"})
     } else { // if the id doesn't exist note will be undefined and will return error message
         response.json({error: "id not found"})
     }
 }
 
-module.exports = {getNotes, getNote, createNote, updateNote, deleteAllNotes, deleteNote}
+module.exports = {getNotes, getMyNotes, getNote, createNote, updateNote, deleteAllNotes, deleteNote}

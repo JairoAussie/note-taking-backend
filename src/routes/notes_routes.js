@@ -1,8 +1,10 @@
 const express = require('express')
 const notesRouter = express.Router();
-const {getNotes, getNote, createNote, updateNote, deleteAllNotes, deleteNote} = require('../controllers/notes_controller')
+const {getNotes, getMyNotes, getNote, createNote, updateNote, deleteAllNotes, deleteNote} = require('../controllers/notes_controller')
 
 notesRouter.get("/", getNotes)
+
+notesRouter.get("/my_notes", getMyNotes)
 
 notesRouter.get("/:id", getNote)
 
