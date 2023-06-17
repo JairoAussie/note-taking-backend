@@ -6,6 +6,20 @@ const getNotes = async (request, response) =>{
     response.send(notes)
 }
 
+const getNote = async (request, response) => {
+    let note = await Note.findById(request.params.id) //params contains the key and value of the route params :id 
+                        .catch(error => {  // mongoose methos can handle errors with catch
+                            console.log("Some error while accessing data:\n" + error)
+                            response.status(404)
+                        })
+    // if we could find the note we will delete it
+    if (note) {
+        response.json(note)
+    } else { // if the id doesn't exist note will be undefined and will return error message
+        response.json({error: "id not found"})
+    }
+}
+
 const createNote = async (request, response) => {
     let newNote = new Note({
         title: request.body.title,
@@ -26,4 +40,19 @@ const deleteAllNotes = async (request, response) => {
     })
 }
 
-module.exports = {getNotes, createNote, deleteAllNotes}
+const deleteNote = async (request, response) => {
+    // find the Note by id as in getNote, with request.params.id
+    // delete the note
+    note = await Note.findByIdAndDelete(request.params.id)
+                .catch(error => {  // mongoose methos can handle errors with catch
+                    console.log("Some error while accessing data:\n" + error)
+                }) 
+    // if we could find the note we will delete it
+    if (note) {
+        response.json({message: "note deleted"})
+    } else { // if the id doesn't exist note will be undefined and will return error message
+        response.json({error: "id not found"})
+    }
+}
+
+module.exports = {getNotes, getNote, createNote, deleteAllNotes, deleteNote}
