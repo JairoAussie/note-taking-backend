@@ -24,6 +24,9 @@ app.get("/", (request, response) => {
 const notesRouter = require('./routes/notes_routes')
 app.use("/notes", notesRouter)
 
+const usersRouter = require('./routes/users_routes')
+app.use("/users", usersRouter)
+
 module.exports = {
 	app
 }
