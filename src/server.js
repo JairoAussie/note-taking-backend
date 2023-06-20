@@ -18,18 +18,53 @@ app.use(helmet.contentSecurityPolicy({
 	}
 }))
 
-app.use(express.json());
-
-async function dbConnect(){
-	try{
-		await mongoose.connect('mongodb://localhost:27017/note_taking_db')
-		console.log("Database connected!")
-	} catch (error) {
-		console.log(`dbConnect failed, error: ${JSON.stringify(error)}`)
-	}
+const cors = require('cors')
+let corsOptions = {
+	origin: ["http://localhost:3000"],
+	optionsSuccessStatus: 200
 }
 
-dbConnect()
+app.use(cors(corsOptions))
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}))
+
+let databaseURL = "";
+switch(process.env.NODE_ENV.toLowerCase()){
+	case "production":
+		databaseURL = process.env.DATABASE_URL;
+		break;
+	case "development":
+		databaseURL = 'mongodb://localhost:27017/note_taking_db';
+		break;
+	case "test":
+		databaseURL = 'mongodb://localhost:27017/note_taking_db_test';
+		break;
+	default:
+		console.error("Wrong environment mode, database cannot connect");
+}
+
+const {databaseConnector} = require("./database")
+databaseConnector(databaseURL).then(() =>{
+	console.log("connected to the db!")
+}).catch(error => {
+	console.log("could not connect to the db!")
+	console.log(error)
+})
+
+app.get("/databaseHealth", (request, response) => {
+    let databaseState = mongoose.connection.readyState;
+    let databaseName = mongoose.connection.name;
+    let databaseModels = mongoose.connection.modelNames();
+    let databaseHost = mongoose.connection.host;
+
+    response.json({
+        readyState: databaseState,
+        dbName: databaseName,
+        dbModels: databaseModels,
+        dbHost: databaseHost
+    })
+});
 
 app.get("/", (request, response) => {
 	response.json({
@@ -42,6 +77,14 @@ app.use("/notes", notesRouter)
 
 const usersRouter = require('./routes/users_routes')
 app.use("/users", usersRouter)
+
+app.get('*', (request, response) =>{
+	response.status(404)
+	response.json({
+		message: "Route not found",
+		path: request.path
+	})
+})
 
 module.exports = {
 	app, HOST, PORT
