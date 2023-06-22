@@ -20,7 +20,7 @@ app.use(helmet.contentSecurityPolicy({
 
 const cors = require('cors')
 let corsOptions = {
-	origin: ["http://localhost:3000"],
+	origin: ["http://localhost:3000", "https://bespoke-klepon-bc5d33.netlify.app/"],
 	optionsSuccessStatus: 200
 }
 
