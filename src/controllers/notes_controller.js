@@ -47,7 +47,7 @@ const getNote = async (request, response) => {
 }
 
 const createNote = async (request, response) => {
-    let user = await User.findOne({username: request.body.username})
+    // let user = await User.findOne({username: request.body.username})
 
     let newNote = new Note({
         title: request.body.title,
@@ -57,8 +57,8 @@ const createNote = async (request, response) => {
         createdAtDate: Date.now()
     })
     await newNote.save()
-    user.notes.push(newNote._id)
-    await user.save() 
+    // user.notes.push(newNote._id)
+    // await user.save() 
     response.status(201)
     response.json(newNote)
 }
