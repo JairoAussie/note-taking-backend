@@ -6,6 +6,10 @@ const UserSchema = mongoose.Schema({
         unique: true,
         required: true
     },
+    password: {
+        type: String,
+        required: true
+    },
     notes: [{type: mongoose.Types.ObjectId, ref: 'Note'}]
 })
 
