@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const bcrypt = require("bcrypt")
+const { createToken } = require('../services/auth_service')
 
 const signup = async (request, response) => {
     
@@ -17,7 +18,27 @@ const signup = async (request, response) => {
                     console.log(error.errors)
             })
 
-    response.send(newUser)
+    const token = createToken(newUser._id, newUser.username)
+    response.json({
+        username: newUser.username,
+        token: token
+    })
 }
 
-module.exports = {signup}
+const login = async (request, response) => {
+    const user = await User.findOne({username: request.body.username})
+
+    if (user && bcrypt.compareSync(request.body.password, user.password)){
+        const token = createToken(user._id, user.username)
+        response.json({
+            username: user.username,
+            token: token
+        })
+    } else {
+        response.json({
+            error: "authentication failed"
+        })
+    }
+}
+
+module.exports = {signup, login}

@@ -4,7 +4,6 @@ const User = require('../models/user')
 const getNotes = async (request, response) =>{
     // request.query contains the string query url -> ?isComplete=true 
     // it is printed as an object
-    console.log(request.query)
     let notes
     //Check if request.query is not empty, if it has at least one key
     if (Object.keys(request.query).length > 0) {
@@ -47,7 +46,9 @@ const getNote = async (request, response) => {
 }
 
 const createNote = async (request, response) => {
-    // let user = await User.findOne({username: request.body.username})
+    // let user = await User.findOne({username: request.user.username})
+    // findById should be better
+    let user = await User.findById(request.user.user_id)
 
     let newNote = new Note({
         title: request.body.title,
@@ -57,8 +58,8 @@ const createNote = async (request, response) => {
         createdAtDate: Date.now()
     })
     await newNote.save()
-    // user.notes.push(newNote._id)
-    // await user.save() 
+    user.notes.push(newNote._id)
+    await user.save() 
     response.status(201)
     response.json(newNote)
 }
